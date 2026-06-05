@@ -78,6 +78,17 @@ class BridgeAgentTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(self.fake_client.started)
         self.assertEqual(len(self.fake_client.handlers), 1)
 
+    async def test_initialize_advertises_supported_prompt_capabilities(self) -> None:
+        agent = TelegramRelayAgent(self.bridge)
+        response = await agent.initialize(protocol_version=1)
+        assert response.agent_capabilities is not None
+        assert response.agent_capabilities.prompt_capabilities is not None
+        self.assertTrue(response.agent_capabilities.prompt_capabilities.image)
+        self.assertTrue(response.agent_capabilities.prompt_capabilities.audio)
+        self.assertTrue(
+            response.agent_capabilities.prompt_capabilities.embedded_context
+        )
+
     async def test_send_text_and_embedded_blob(self) -> None:
         await self.bridge.send_prompt_blocks(
             "session-1",

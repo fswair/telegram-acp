@@ -28,6 +28,7 @@ from acp.schema import (
     Implementation,
     ListSessionsResponse,
     McpServerStdio,
+    PromptCapabilities,
     ResourceContentBlock,
     SessionInfo,
     SseMcpServer,
@@ -63,7 +64,13 @@ class TelegramRelayAgent(Agent):
             protocol_version=PROTOCOL_VERSION
             if protocol_version <= PROTOCOL_VERSION
             else PROTOCOL_VERSION,
-            agent_capabilities=AgentCapabilities(),
+            agent_capabilities=AgentCapabilities(
+                prompt_capabilities=PromptCapabilities(
+                    image=True,
+                    audio=True,
+                    embedded_context=True,
+                )
+            ),
             agent_info=Implementation(
                 name="telegram-acp-relay",
                 title="Telegram ACP Relay",
