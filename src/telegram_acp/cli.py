@@ -8,7 +8,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from .agent import run_telegram_acp_agent
-from .config import RuntimeConfig, TelegramCredentials, parse_chat_ref
+from .config import RuntimeConfig, TelegramCredentials, parse_chat_ref, require_env
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -17,7 +17,6 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--target-chat",
-        required=True,
         help="Telegram username or numeric chat id to relay.",
     )
     parser.add_argument(
@@ -56,8 +55,9 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def runtime_config_from_args(args: argparse.Namespace) -> RuntimeConfig:
+    target_chat = args.target_chat or require_env("TELEGRAM_TARGET_CHAT")
     return RuntimeConfig(
-        target_chat=parse_chat_ref(args.target_chat),
+        target_chat=parse_chat_ref(target_chat),
         session_name=args.session_name,
         first_response_timeout=args.first_response_timeout,
         idle_timeout=args.idle_timeout,

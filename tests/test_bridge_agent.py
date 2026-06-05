@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import base64
+import os
 import tempfile
 import unittest
 from pathlib import Path
 from typing import cast
+from unittest.mock import patch
 
 from acp import text_block
 from acp.helpers import embedded_blob_resource, resource_block
@@ -177,6 +179,13 @@ class CliTests(unittest.TestCase):
         self.assertEqual(config.first_response_timeout, 30.0)
         self.assertEqual(config.idle_timeout, 2.0)
         self.assertEqual(config.log_level, "DEBUG")
+
+    def test_parser_falls_back_to_env_target_chat(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args([])
+        with patch.dict(os.environ, {"TELEGRAM_TARGET_CHAT": "@env_bot"}, clear=False):
+            config = runtime_config_from_args(args)
+        self.assertEqual(config.target_chat, "env_bot")
 
 
 if __name__ == "__main__":
